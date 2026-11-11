@@ -1,0 +1,146 @@
+file,column,type,description
+passages.csv,id,string,Stable row id <prompt_id>__<model>__a<attempt> (pilot_range rows: <prompt_id>__<model>__range_a<attempt>); never renumbered across dataset versions.
+passages.csv,dataset_version_added,integer,Dataset version in which this row first appeared (diff versions with it).
+passages.csv,attempt,integer,"0-based index of the call that produced this passage within its (prompt, model, protocol) cell (0 = first call; >0 after a truncation, quarantine or error re-call)."
+passages.csv,prompt_id,string,Prompt id (join key to prompts.csv and blocks.csv). n### = new prompt; tr_p### = regeneration of a reconstructed competition train prompt; v1_g### = prompt_bank_v1 re-issue.
+passages.csv,model,string,The competition label of the model that wrote the passage (one of the 18 Name That LLM labels).
+passages.csv,text,string,"The passage exactly as returned by the API (no cleaning, no truncation)."
+passages.csv,n_words,integer,Whitespace word count of `text`.
+passages.csv,word_min,integer,"Lower bound of the length range stated in the prompt, '(words min-max)'."
+passages.csv,word_max,integer,Upper bound of the length range stated in the prompt.
+passages.csv,target_words,integer,Per-generation target length N sent as '(about N words)' (length_mode target); empty when the prompt carried a shared range '(words min-max)'.
+passages.csv,prompt_sent,string,"The exact user message sent for this passage (the prompt verbatim, including its length instruction)."
+passages.csv,domain,string,"Prompt domain (physics, biology, philosophy, mathematics, history, creative prose, computer science, psychology, economics, other)."
+passages.csv,task_type,string,"Prompt task type: explain concept, describe/narrate, argue/opinion, story/fiction, compare."
+passages.csv,topic,string,Short topic name of the prompt.
+passages.csv,style,string,Style modifiers placed in the prompt ('; '-separated); for train_regen the reconstruction's audience/style note.
+passages.csv,opening_phrase,string,"Opening phrase dictated by the prompt, empty if none."
+passages.csv,split,string,"new (prompts written for this dataset), new2 (prompts written in the register of the reconstructed competition prompts), train_regen (reconstructed competition train prompts), new_kimi_nothink (kimi-k3 re-run on `new` with reasoning disabled), proxy_v1 (Kaggle-proxy rows on earlier prompts), pilot_range (pilot rows with the shared length range)."
+passages.csv,provider_route,string,"Route that produced the row: anthropic (first-party API), openai (first-party API), openrouter (first-party provider pinned), vertex (Google Vertex AI), kaggle_proxy (Kaggle Benchmarks Model Proxy)."
+passages.csv,requested_model_id,string,Exact model id sent in the request.
+passages.csv,served_model_id,string,Model id reported by the response (rows whose served id did not match were quarantined and are not in this file).
+passages.csv,served_provider,string,Backend that served the call as reported by the route (e.g. OpenRouter `provider`).
+passages.csv,generated_at_utc,datetime,UTC time the response was received.
+passages.csv,reasoning_setting,string,What was sent about reasoning/thinking (normally nothing: provider default).
+passages.csv,finish_reason,string,Raw finish/stop reason from the API.
+passages.csv,finish_reason_norm,string,"Normalised finish reason: stop, length, content_filter."
+passages.csv,input_tokens,integer,Prompt tokens billed.
+passages.csv,output_tokens,integer,"Output tokens billed, including hidden reasoning/thinking tokens."
+passages.csv,reasoning_tokens,integer,Hidden reasoning/thinking tokens reported by the provider (empty when not reported).
+passages.csv,cost_usd,number,"Cost of the call in USD (provider-reported where available, else usage x list price; Kaggle proxy rows: quota dollars)."
+passages.csv,call_id,string,Join key to provenance.jsonl.
+passages.csv,response_id,string,Provider response id.
+passages.csv,n_calls_for_cell,integer,"Number of calls made for this (prompt, model) cell (retries after truncation or quarantine)."
+passages.csv,source_prompt_id,string,For train_regen: the competition prompt_id (join to the competition's train.csv inside a Kaggle notebook); for v1_regen: the prompt_bank_v1 id.
+passages.csv,is_refusal,boolean,"Refusal stop reason, content filter, or refusal language detected."
+passages.csv,is_truncated,boolean,The response hit its output cap (finish reason length/max_tokens).
+passages.csv,is_empty,boolean,Fewer than 5 words.
+passages.csv,has_markdown,boolean,"Markdown markers detected (bold, headings, bullets, code, italics)."
+passages.csv,in_word_range,boolean,word_min <= n_words <= word_max.
+passages.csv,passes_funnel,boolean,"Passes the full quality funnel: unique, not truncated/filtered, no code/markdown/emoji/URL, single paragraph, 40-250 words, English, no refusal or chatty opener, deduplicated, fewer than 3 shared 8-grams with any competition passage."
+passages.csv,passes_funnel_regen,boolean,Same funnel without the competition-train 8-gram step (train_regen passages naturally share prompt-dictated phrases with the competition passages of the same prompt); test overlap still excluded.
+passages.csv,funnel_fail_step,string,First funnel step the row failed (empty if it passes).
+passages.csv,max_shared_8grams_comp,integer,Largest number of 8-word shingles shared with any single competition passage (train or test).
+passages_clean.csv,id,string,Stable row id <prompt_id>__<model>__a<attempt> (pilot_range rows: <prompt_id>__<model>__range_a<attempt>); never renumbered across dataset versions.
+passages_clean.csv,dataset_version_added,integer,Dataset version in which this row first appeared (diff versions with it).
+passages_clean.csv,attempt,integer,"0-based index of the call that produced this passage within its (prompt, model, protocol) cell (0 = first call; >0 after a truncation, quarantine or error re-call)."
+passages_clean.csv,prompt_id,string,Prompt id (join key to prompts.csv and blocks.csv). n### = new prompt; tr_p### = regeneration of a reconstructed competition train prompt; v1_g### = prompt_bank_v1 re-issue.
+passages_clean.csv,model,string,The competition label of the model that wrote the passage (one of the 18 Name That LLM labels).
+passages_clean.csv,text,string,"The passage exactly as returned by the API (no cleaning, no truncation)."
+passages_clean.csv,n_words,integer,Whitespace word count of `text`.
+passages_clean.csv,word_min,integer,"Lower bound of the length range stated in the prompt, '(words min-max)'."
+passages_clean.csv,word_max,integer,Upper bound of the length range stated in the prompt.
+passages_clean.csv,target_words,integer,Per-generation target length N sent as '(about N words)' (length_mode target); empty when the prompt carried a shared range '(words min-max)'.
+passages_clean.csv,prompt_sent,string,"The exact user message sent for this passage (the prompt verbatim, including its length instruction)."
+passages_clean.csv,domain,string,"Prompt domain (physics, biology, philosophy, mathematics, history, creative prose, computer science, psychology, economics, other)."
+passages_clean.csv,task_type,string,"Prompt task type: explain concept, describe/narrate, argue/opinion, story/fiction, compare."
+passages_clean.csv,topic,string,Short topic name of the prompt.
+passages_clean.csv,style,string,Style modifiers placed in the prompt ('; '-separated); for train_regen the reconstruction's audience/style note.
+passages_clean.csv,opening_phrase,string,"Opening phrase dictated by the prompt, empty if none."
+passages_clean.csv,split,string,"new (prompts written for this dataset), new2 (prompts written in the register of the reconstructed competition prompts), train_regen (reconstructed competition train prompts), new_kimi_nothink (kimi-k3 re-run on `new` with reasoning disabled), proxy_v1 (Kaggle-proxy rows on earlier prompts), pilot_range (pilot rows with the shared length range)."
+passages_clean.csv,provider_route,string,"Route that produced the row: anthropic (first-party API), openai (first-party API), openrouter (first-party provider pinned), vertex (Google Vertex AI), kaggle_proxy (Kaggle Benchmarks Model Proxy)."
+passages_clean.csv,requested_model_id,string,Exact model id sent in the request.
+passages_clean.csv,served_model_id,string,Model id reported by the response (rows whose served id did not match were quarantined and are not in this file).
+passages_clean.csv,served_provider,string,Backend that served the call as reported by the route (e.g. OpenRouter `provider`).
+passages_clean.csv,generated_at_utc,datetime,UTC time the response was received.
+passages_clean.csv,reasoning_setting,string,What was sent about reasoning/thinking (normally nothing: provider default).
+passages_clean.csv,finish_reason,string,Raw finish/stop reason from the API.
+passages_clean.csv,finish_reason_norm,string,"Normalised finish reason: stop, length, content_filter."
+passages_clean.csv,input_tokens,integer,Prompt tokens billed.
+passages_clean.csv,output_tokens,integer,"Output tokens billed, including hidden reasoning/thinking tokens."
+passages_clean.csv,reasoning_tokens,integer,Hidden reasoning/thinking tokens reported by the provider (empty when not reported).
+passages_clean.csv,cost_usd,number,"Cost of the call in USD (provider-reported where available, else usage x list price; Kaggle proxy rows: quota dollars)."
+passages_clean.csv,call_id,string,Join key to provenance.jsonl.
+passages_clean.csv,response_id,string,Provider response id.
+passages_clean.csv,n_calls_for_cell,integer,"Number of calls made for this (prompt, model) cell (retries after truncation or quarantine)."
+passages_clean.csv,source_prompt_id,string,For train_regen: the competition prompt_id (join to the competition's train.csv inside a Kaggle notebook); for v1_regen: the prompt_bank_v1 id.
+passages_clean.csv,is_refusal,boolean,"Refusal stop reason, content filter, or refusal language detected."
+passages_clean.csv,is_truncated,boolean,The response hit its output cap (finish reason length/max_tokens).
+passages_clean.csv,is_empty,boolean,Fewer than 5 words.
+passages_clean.csv,has_markdown,boolean,"Markdown markers detected (bold, headings, bullets, code, italics)."
+passages_clean.csv,in_word_range,boolean,word_min <= n_words <= word_max.
+passages_clean.csv,passes_funnel,boolean,"Passes the full quality funnel: unique, not truncated/filtered, no code/markdown/emoji/URL, single paragraph, 40-250 words, English, no refusal or chatty opener, deduplicated, fewer than 3 shared 8-grams with any competition passage."
+passages_clean.csv,passes_funnel_regen,boolean,Same funnel without the competition-train 8-gram step (train_regen passages naturally share prompt-dictated phrases with the competition passages of the same prompt); test overlap still excluded.
+passages_clean.csv,funnel_fail_step,string,First funnel step the row failed (empty if it passes).
+passages_clean.csv,max_shared_8grams_comp,integer,Largest number of 8-word shingles shared with any single competition passage (train or test).
+blocks.csv,prompt_id,string,Stable prompt identifier associated with the block.
+blocks.csv,split,string,"Dataset partition/protocol for the block (for example `new`, `new2`, `train_regen`)."
+blocks.csv,n_models_expected,integer,Number of model-label responses expected for this prompt in this split.
+blocks.csv,n_models_present,integer,Number of expected model labels with a passage row present.
+blocks.csv,n_models_clean,integer,Number of present model passages that pass the clean/funnel criteria.
+blocks.csv,is_complete,boolean,True when all expected model passages are present.
+blocks.csv,is_complete_clean,boolean,True when the block is complete and every expected model passage passes the clean criteria.
+blocks.csv,models_missing,string,Semicolon-separated model labels expected but not present; blank when none.
+blocks.csv,models_failing,string,Semicolon-separated present model labels whose passage does not pass the clean criteria; blank when none.
+label_summary.csv,label,string,Competition model label assigned to the passage rows.
+label_summary.csv,split,string,Dataset split summarized.
+label_summary.csv,rows,integer,Number of passage rows for this label and split.
+label_summary.csv,clean_rows,integer,Number of those rows that pass the dataset's clean/funnel criteria.
+label_summary.csv,funnel_pass_rate,numeric,"Fraction of rows passing the funnel (`clean_rows / rows`, as reflected in the data)."
+label_summary.csv,median_words,numeric,Median observed word count (`n_words`) for the label/split.
+label_summary.csv,emdash_per_100_words,numeric,Em-dash occurrences normalized to 100 words.
+label_summary.csv,curly_quote_share,numeric,Share of passages containing curly double-quote typography.
+label_summary.csv,curly_apostrophe_share,numeric,Share of passages containing curly apostrophe typography.
+label_summary.csv,refusal_rate,numeric,Share of passages flagged as refusals.
+label_summary.csv,markdown_rate,numeric,Share of passages flagged as containing Markdown.
+label_summary.csv,mean_target_ratio,numeric,Mean observed word count divided by per-row target word count (`n_words / target_words`).
+label_summary.csv,routes,string,"Counts of passage rows grouped by `provider_route`, formatted as semicolon-separated `route=count` entries."
+label_summary.csv,served_model_ids,string,"Counts grouped by the response's served model identifier, formatted as semicolon-separated `id=count` entries."
+label_summary.csv,first_generated_utc,datetime,"Earliest passage generation timestamp in the group, UTC."
+label_summary.csv,last_generated_utc,datetime,"Latest passage generation timestamp in the group, UTC."
+prompts.csv,prompt_id,string,Stable prompt identifier used by passage and block tables.
+prompts.csv,split,string,Split/protocol to which this prompt belongs.
+prompts.csv,prompt,string,"Full prompt template sent to generation, with `{N}` denoting the row-specific target word count where applicable."
+prompts.csv,prompt_body,string,Prompt instruction text without the generated length-target suffix.
+prompts.csv,domain,string,Broad subject area assigned to the prompt.
+prompts.csv,task_type,string,"Task category assigned to the prompt (e.g. explain concept, describe/narrate, argue/opinion)."
+prompts.csv,topic,string,Short human-readable topic tag.
+prompts.csv,style,string,Semicolon-separated style modifiers requested or tagged for the prompt; blank if none.
+prompts.csv,opening_phrase,string,Required opening phrase where specified; blank if no prescribed opening.
+prompts.csv,word_min,integer,Lower word-count bound recorded for the prompt/generation protocol.
+prompts.csv,word_max,integer,Upper word-count bound recorded for the prompt/generation protocol.
+prompts.csv,length_mode,string,How the length instruction is expressed (e.g. per-generation `target` versus pilot shared `range`).
+prompts.csv,prompt_source,string,"Provenance description for the prompt text, including whether authored for this dataset or reconstructed."
+prompts.csv,prompt_licence,string,License recorded for the prompt text/source.
+train_vs_dataset_stats.csv,label,string,Competition model label being compared.
+train_vs_dataset_stats.csv,n_train,integer,Number of competition training passages used for this label aggregate.
+train_vs_dataset_stats.csv,n_dataset,integer,Number of dataset passages used for this label aggregate.
+train_vs_dataset_stats.csv,train_mean_words,numeric,Mean passage word count among the competition training rows for this label.
+train_vs_dataset_stats.csv,dataset_mean_words,numeric,Mean passage word count among this dataset rows for this label.
+train_vs_dataset_stats.csv,train_median_words,numeric,Median passage word count among the competition training rows for this label.
+train_vs_dataset_stats.csv,dataset_median_words,numeric,Median passage word count among this dataset rows for this label.
+train_vs_dataset_stats.csv,train_emdash_share,numeric,Fraction of competition training passages for this label containing an em dash.
+train_vs_dataset_stats.csv,dataset_emdash_share,numeric,Fraction of dataset passages for this label containing an em dash.
+train_vs_dataset_stats.csv,train_emdash_per_100_words,numeric,Em-dash count per 100 words in the competition training passages for this label.
+train_vs_dataset_stats.csv,dataset_emdash_per_100_words,numeric,Em-dash count per 100 words in this dataset passages for this label.
+train_vs_dataset_stats.csv,train_curly_dquote_share,numeric,Fraction of competition training passages for this label containing curly double-quote typography.
+train_vs_dataset_stats.csv,dataset_curly_dquote_share,numeric,Fraction of this dataset passages for this label containing curly double-quote typography.
+train_vs_dataset_stats.csv,train_curly_apostrophe_share,numeric,Fraction of competition training passages for this label containing curly apostrophes.
+train_vs_dataset_stats.csv,dataset_curly_apostrophe_share,numeric,Fraction of this dataset passages for this label containing curly apostrophes.
+train_vs_dataset_stats.csv,train_semicolon_per_100_words,numeric,Semicolon count per 100 words in the competition training passages for this label.
+train_vs_dataset_stats.csv,dataset_semicolon_per_100_words,numeric,Semicolon count per 100 words in this dataset passages for this label.
+train_vs_dataset_stats.csv,train_italics_share,numeric,Fraction of competition training passages for this label containing italic markup.
+train_vs_dataset_stats.csv,dataset_italics_share,numeric,Fraction of this dataset passages for this label containing italic markup.
+train_vs_dataset_stats.csv,train_mean_sentence_words,numeric,Mean sentence length in words in the competition training passages for this label.
+train_vs_dataset_stats.csv,dataset_mean_sentence_words,numeric,Mean sentence length in words in this dataset passages for this label.
+train_vs_dataset_stats.csv,register_flags,string,"Human-readable notes for detected differences on selected statistics; blank where no listed flag was recorded. These are descriptive flags, not a complete statistical test or guarantee of stylistic equivalence."
